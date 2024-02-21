@@ -16,9 +16,12 @@ namespace PrimeiraAPI.Controllers
             _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
         }
         [HttpPost]
-        public IActionResult Add(EmployeeViewModel employeeView)
+        public IActionResult Add([FromForm] EmployeeViewModel employeeView)
         {
-            var employee = new Employee(name:employeeView.name, age:employeeView.age, photo: null);
+            var filePath = Path.Combine("Storage", employeeView.Photo.FileName);
+            using Stream fileStream = new FileStream(filePath, FileMode.Create);
+            employeeView.Photo.CopyTo(fileStream);
+            var employee = new Employee(employeeView.name, employeeView.age, filePath);
             _employeeRepository.Add(employee);
             return Ok();
         }
@@ -26,6 +29,14 @@ namespace PrimeiraAPI.Controllers
         public IActionResult Get() { 
             var employees= _employeeRepository.Get();
             return Ok(employees);
+        }
+        [HttpPost]
+        [Route("{id}/download")]
+        public async Task<IActionResult> DownloadPhoto(int id) {
+            
+            var employee = _employeeRepository.Get(id);
+            var dataBytes = await System.IO.File.ReadAllBytesAsync(employee.Result.Photo);
+            return File(dataBytes, "image/jpg");
         }
     }
 }

@@ -6,6 +6,8 @@ namespace PrimeiraAPI.Interfaces
     {
         public Task Add(Employee employe);
         public Task<List<Employee>> Get();
+        public Task<Employee>? Get(int id);
+
 
     }
 }

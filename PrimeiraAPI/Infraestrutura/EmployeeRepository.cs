@@ -17,5 +17,10 @@ namespace PrimeiraAPI.Infraestrutura
         {
             return await _context.Employees.ToListAsync();
         }
+
+        public async Task<Employee>? Get(int id)
+        {
+            return await _context.Employees.FindAsync(id);
+        }
     }
 }
